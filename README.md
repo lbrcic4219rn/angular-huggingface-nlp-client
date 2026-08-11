@@ -1,16 +1,18 @@
-# NLP Toolkit
+# angular-huggingface-nlp-client
 
-A single-page Angular application that puts a friendly UI in front of the
-[Hugging Face](https://huggingface.co/) inference API. Paste in some text and get
-back named entities, sentiment, detected language, or a similarity score between
-two documents — with every API call recorded in a session history view.
+Text analysis client built with Angular and the Hugging Face inference API: four
+NLP tools behind a token gated router, no backend.
+
+Paste in some text and get back named entities, sentiment, a detected language,
+or a similarity score between two documents. Every API call is recorded in a
+session history view.
 
 > Built as a university project for an advanced web development course.
 
 ## Features
 
 | Feature | What it does |
-| --- | --- |
+| :--- | :--- |
 | **Entity extraction** | Finds people, organisations and places in a text, with an adjustable confidence threshold. |
 | **Sentiment analysis** | Scores English text from negative to positive. |
 | **Language detection** | Identifies the language of a text across 20 languages. |
@@ -22,16 +24,18 @@ token before the router will let you in.
 
 ## Tech stack
 
-- **Angular 21** with modules, routing, route guards, and the built-in control flow syntax (`@if` / `@for`)
-- **TypeScript**
-- **RxJS** — `Subject`-based state for token validity
-- **Angular HttpClient** with a custom `HttpInterceptor` for request logging
-- **Bootstrap 5** for layout and components
+* **Angular 21** with modules, routing, route guards, and the built in control
+  flow syntax (`@if` / `@for`)
+* **TypeScript**
+* **RxJS** for `Subject` based state, so the navbar reacts to token validity
+* **Angular HttpClient** with a custom `HttpInterceptor` for request logging
+* **Bootstrap 5** for layout and components
 
-Each capability is a separate model on Hugging Face's serverless inference API:
+There is no server of its own. The browser calls Hugging Face directly, and each
+capability is a separate model on their serverless inference API:
 
 | Feature | Model |
-| --- | --- |
+| :--- | :--- |
 | Entity extraction | `dslim/bert-base-NER` |
 | Sentiment analysis | `distilbert-base-uncased-finetuned-sst-2-english` |
 | Language detection | `papluca/xlm-roberta-base-language-detection` |
@@ -39,27 +43,28 @@ Each capability is a separate model on Hugging Face's serverless inference API:
 
 ## Getting an API token
 
-The app talks to Hugging Face, which requires a free access token:
+The app talks to Hugging Face, which requires a free access token.
 
 1. Create an account at [huggingface.co/join](https://huggingface.co/join).
-2. Create a **fine-grained** token with the **"Make calls to Inference
-   Providers"** permission. This link pre-selects both settings:
+2. Create a token of type "Fine-grained" carrying the permission
+   "Make calls to Inference Providers". This link preselects both settings:
    [create the token](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained).
 3. Paste it into the home page of the running app and submit.
 
-> A plain read-only token is **not** enough. It authenticates successfully but
-> the API rejects every inference call with `403 Forbidden`, so the app checks
-> for the inference permission before accepting a token.
+> A token with read access only is **not** enough. It authenticates
+> successfully, but the API rejects every inference call with `403 Forbidden`.
+> The app therefore validates a token by making one small inference request
+> rather than by checking the account endpoint, so an unusable token is caught
+> immediately instead of failing later on every feature page.
 
-The token is validated against the account endpoint before it is accepted, then
-kept in `localStorage` so it survives a page reload. It is sent as an
-`Authorization: Bearer` header, never as a URL parameter, so it does not appear
-in the request history. It is never committed to the repo — each user supplies
-their own.
+Once accepted, the token is kept in `localStorage` so it survives a page reload.
+It travels in an `Authorization: Bearer` header, never as a URL parameter, so it
+cannot show up in the request history. It is never committed to the repository,
+since each user supplies their own.
 
 > **Note:** this project originally used the [Dandelion](https://dandelion.eu/)
-> API. Dandelion is being discontinued on 30 November 2026 and has already closed
-> new sign-ups, so the app was ported to Hugging Face.
+> API. Dandelion closed new signups and is being discontinued on 30 November
+> 2026, so the app was ported to Hugging Face.
 
 ## Running locally
 
@@ -84,9 +89,10 @@ npm run build
 npm run deploy
 ```
 
-This builds with the correct `--base-href` and pushes `dist/domaci` to the
-`gh-pages` branch. Requires `npx angular-cli-ghpages` (installed on first run)
-and push access to the repository.
+This builds with the correct base href and pushes
+`dist/angular-huggingface-nlp-client` to the `gh-pages` branch. It requires
+`npx angular-cli-ghpages`, installed on first run, and push access to the
+repository.
 
 ## Project structure
 
@@ -94,9 +100,10 @@ and push access to the repository.
 src/app/
 ├── components/          # One component per feature, plus home, nav, history
 ├── services/
-│   ├── api.service.ts        # All inference endpoints + token state
-│   ├── history.service.ts    # In-memory request log
-│   └── logger.interceptor.ts # Records each outgoing request
+│   ├── api.service.ts        # Inference endpoints, response mapping, token state
+│   ├── history.service.ts    # Request log held in memory
+│   ├── logger.interceptor.ts # Records each outgoing request
+│   └── notification.service.ts # Toast messages for errors and confirmations
 ├── guards/
 │   └── auth.guard.ts    # Blocks feature routes until a token is set
 ├── models.ts            # Shared response interfaces
