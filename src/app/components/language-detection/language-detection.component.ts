@@ -1,35 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {DetectedLanguage} from "../../models";
 import {ApiService} from "../../services/api.service";
+import {NotificationService} from "../../services/notification.service";
 
 @Component({
-  selector: 'app-language-detection',
-  templateUrl: './language-detection.component.html',
-  styleUrls: ['./language-detection.component.css']
+    selector: 'app-language-detection',
+    templateUrl: './language-detection.component.html',
+    styleUrls: ['./language-detection.component.css'],
+    standalone: false
 })
-export class LanguageDetectionComponent implements OnInit {
+export class LanguageDetectionComponent {
   entityModel = {
-    text: "",
-    clean: false,
+    text: ""
   };
   detectedLanguages: DetectedLanguage[] = [];
 
-  constructor(private apiService: ApiService) { }
-
-  ngOnInit(): void {
-  }
+  constructor(
+    private apiService: ApiService,
+    private notificationService: NotificationService
+  ) { }
 
   onSubmit() {
-    this.apiService.languageDetection(this.entityModel.text, this.entityModel.clean).subscribe(
-      value => this.detectedLanguages = value.detectedLangs,
-      error => alert(error.error.message)
-    )
-  }
-
-  handleCleanCheck($event: any) {
-    const targetElement = $event.target;
-    if(targetElement != null){
-          this.entityModel.clean = targetElement.checked;
-    }
+    this.apiService.languageDetection(this.entityModel.text).subscribe({
+      next: languages => this.detectedLanguages = languages,
+      error: error => this.notificationService.fromHttpError(error)
+    })
   }
 }

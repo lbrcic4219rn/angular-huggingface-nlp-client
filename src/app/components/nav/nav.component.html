@@ -1,23 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" [routerLink]="['/']">NLP Toolkit</a>
 
-<ul>
-    <li>
-        <a [routerLink]="['/']" routerLinkActive="router-link-active" >Home</a>
-    </li>
-  <ng-container *ngIf="isValid">
-    <li>
-          <a [routerLink]="['/entity-extraction']" routerLinkActive="router-link-active" >Entity extraction</a>
-      </li>
-      <li>
-          <a [routerLink]="['/language-detection']" routerLinkActive="router-link-active" >Language detection</a>
-      </li>
-      <li>
-          <a [routerLink]="['/sentiment-analysis']" routerLinkActive="router-link-active" >Sentiment analysis</a>
-      </li>
-      <li>
-          <a [routerLink]="['/text-similarity']" routerLinkActive="router-link-active" >Text similartiy</a>
-      </li>
-      <li>
-          <a [routerLink]="['/history']" routerLinkActive="router-link-active" >History</a>
-      </li>
-  </ng-container>
-</ul>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+      >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        </li>
+        @if (isValid) {
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/entity-extraction']" routerLinkActive="active">Entity extraction</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/language-detection']" routerLinkActive="active">Language detection</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/sentiment-analysis']" routerLinkActive="active">Sentiment analysis</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/text-similarity']" routerLinkActive="active">Text similarity</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/history']" routerLinkActive="active">History</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

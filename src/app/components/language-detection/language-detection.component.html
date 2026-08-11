@@ -1,24 +1,34 @@
-<p>Language Detection</p>
-<form (ngSubmit)="onSubmit()">
-  <label>Text</label>
-  <br>
-  <textarea
-    name="text"
-    type="text"
-    required
-    [(ngModel)]="entityModel.text"
-  ></textarea>
-  <br>
-  <input
-    type="checkbox"
-    name="image"
-    value="image"
-    (change)="handleCleanCheck($event)"
-  />
-  <label>Clean</label>
-  <br>
-  <button type="submit">Submit</button>
+<h1 class="mb-4">Language detection</h1>
+<p class="text-secondary">
+  Identifies the language of a text across 20 languages, using the
+  <code>papluca/xlm-roberta-base-language-detection</code> model.
+</p>
+
+<form (ngSubmit)="onSubmit()" class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="mb-3">
+      <label class="form-label" for="text">Text</label>
+      <textarea
+        class="form-control"
+        id="text"
+        rows="5"
+        name="text"
+        required
+        [(ngModel)]="entityModel.text"
+      ></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
 </form>
-<div *ngFor="let lang of detectedLanguages">
-  <p>Language: {{ lang.lang }} - Confidence: {{ lang.confidence }}</p>
-</div>
+
+@if (detectedLanguages.length) {
+  <ul class="list-group shadow-sm">
+    @for (lang of detectedLanguages; track lang.lang) {
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-uppercase">{{ lang.lang }}</span>
+        <span class="badge bg-primary rounded-pill">{{ lang.confidence | number: '1.2-4' }}</span>
+      </li>
+    }
+  </ul>
+}

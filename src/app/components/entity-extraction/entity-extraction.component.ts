@@ -1,57 +1,48 @@
-import { Component, OnInit } from '@angular/core';
-import {fakeAsync} from "@angular/core/testing";
+import { Component } from '@angular/core';
 import {ApiService} from "../../services/api.service";
-import {logMessages} from "@angular-devkit/build-angular/src/builders/browser-esbuild/esbuild";
 import {Annotation} from "../../models";
+import {NotificationService} from "../../services/notification.service";
 
 @Component({
-  selector: 'app-entity-extraction',
-  templateUrl: './entity-extraction.component.html',
-  styleUrls: ['./entity-extraction.component.css']
+    selector: 'app-entity-extraction',
+    templateUrl: './entity-extraction.component.html',
+    styleUrls: ['./entity-extraction.component.css'],
+    standalone: false
 })
-export class EntityExtractionComponent implements OnInit {
+export class EntityExtractionComponent {
   public entityModel = {
     text: "",
-    minConf: 0,
-    include: {
-      image: false,
-      abstract: false,
-      categories: false
-    },
+    minConf: 0
   }
   public annotations: Annotation[] = [];
-  constructor(private apiService: ApiService) { }
+  public submitted = false;
 
-  ngOnInit(): void {
-  }
+  constructor(
+    private apiService: ApiService,
+    private notificationService: NotificationService
+  ) { }
 
   setMinConf(value: string){
     this.entityModel.minConf = parseFloat(value);
   }
 
-  handleIncludeCheck($event: any) {
-    const targetElement = $event.target;
-    if(targetElement != null){
-      console.log(targetElement.value)
-      switch (targetElement.value){
-        case "image":
-          this.entityModel.include.image = targetElement.checked;
-          break;
-        case "abstract":
-          this.entityModel.include.abstract = targetElement.checked;
-          break;
-        default:
-          this.entityModel.include.categories = targetElement.checked;
-          break;
-      }
+  /** Colours the badge by entity type: person, organisation, location, other. */
+  badgeClass(type: string): string {
+    switch (type) {
+      case 'PER': return 'bg-primary';
+      case 'ORG': return 'bg-success';
+      case 'LOC': return 'bg-warning text-dark';
+      default: return 'bg-secondary';
     }
   }
 
   onSubmit() {
-    this.apiService.entityExtraction(this.entityModel.text, this.entityModel.minConf, this.entityModel.include).subscribe(
-      value => this.annotations = value.annotations,
-      error => alert(error.error.message)
-    )
-    console.log(this.entityModel)
+    this.apiService.entityExtraction(this.entityModel.text, this.entityModel.minConf).subscribe({
+      next: annotations => {
+        this.annotations = annotations;
+        this.submitted = true;
+      },
+      error: error => this.notificationService.fromHttpError(error)
+    })
   }
 }

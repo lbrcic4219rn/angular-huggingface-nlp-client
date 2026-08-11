@@ -1,23 +1,45 @@
-<p>Entity Extraction</p>
-<form (ngSubmit)="onSubmit()">
-  <label>Text 1</label>
-  <br>
-  <textarea
-    name="text"
-    type="text"
-    required
-    [(ngModel)]="entityModel.text1"
-  ></textarea>
-  <br>
-  <label>Text 2</label>
-  <br>
-  <textarea
-    name="text"
-    type="text"
-    required
-    [(ngModel)]="entityModel.text2"
-  ></textarea>
-  <br>
-  <button type="submit">Submit</button>
-  <p>result: {{ result }}</p>
+<h1 class="mb-4">Text similarity</h1>
+<p class="text-secondary">
+  Compares the meaning of two texts and scores them from 0 to 1, using
+  sentence embeddings from <code>all-MiniLM-L6-v2</code>.
+</p>
+
+<form (ngSubmit)="onSubmit()" class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="text1">Text 1</label>
+        <textarea
+          class="form-control"
+          id="text1"
+          rows="6"
+          name="text1"
+          required
+          [(ngModel)]="entityModel.text1"
+        ></textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="text2">Text 2</label>
+        <textarea
+          class="form-control"
+          id="text2"
+          rows="6"
+          name="text2"
+          required
+          [(ngModel)]="entityModel.text2"
+        ></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+  </div>
 </form>
+
+@if (result !== null) {
+  <div class="card shadow-sm">
+    <div class="card-body text-center">
+      <h2 class="h5 text-secondary">Similarity</h2>
+      <p class="display-6 mb-0">{{ result | number: '1.2-4' }}</p>
+    </div>
+  </div>
+}

@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import {ApiService} from "../../services/api.service";
 
 @Component({
-  selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+    selector: 'app-nav',
+    templateUrl: './nav.component.html',
+    styleUrls: ['./nav.component.css'],
+    standalone: false
 })
 export class NavComponent implements OnInit {
   public isValid: boolean = false;
@@ -14,7 +15,6 @@ export class NavComponent implements OnInit {
     localStorage.getItem('token') != null ? this.isValid = true : this.isValid = false;
     this.apiService.$visible.subscribe(
       value => {
-        console.log(value)
         this.isValid = value
       }
     )

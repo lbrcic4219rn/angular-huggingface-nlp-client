@@ -1,81 +1,53 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {ApiService} from "../../services/api.service";
+import {NotificationService} from "../../services/notification.service";
+import {Sentiment} from "../../models";
 
 @Component({
-  selector: 'app-sentiment-analysis',
-  templateUrl: './sentiment-analysis.component.html',
-  styleUrls: ['./sentiment-analysis.component.css']
+    selector: 'app-sentiment-analysis',
+    templateUrl: './sentiment-analysis.component.html',
+    styleUrls: ['./sentiment-analysis.component.css'],
+    standalone: false
 })
-export class SentimentAnalysisComponent implements OnInit {
+export class SentimentAnalysisComponent {
 
   public entityModel = {
-    text: "",
-    language: "auto"
-  };
-  public sentiment = {
-    score: 0,
-    type: '',
+    text: ""
   };
 
-  public sentimentTest: number = -1;
+  public sentiment: Sentiment | null = null;
 
   private colorRed = { r: 255, g: 0, b: 0 };
   private colorGreen = { r: 0, g: 255, b: 0 };
 
-  public options = [
-    { id: 'auto', name: 'Auto Detect' },
-    { id: 'en', name: 'English' },
-    { id: 'it', name: 'Italian' },
-  ];
+  public sentimentColor = { r: 0, g: 0, b: 0 };
 
-  sentimentColor = {
-    r:
-      this.colorRed.r +
-      (this.colorGreen.r - this.colorRed.r) *
-      this.normalizeValue(this.sentimentTest),
-    g:
-      this.colorRed.g +
-      (this.colorGreen.g - this.colorRed.g) *
-      this.normalizeValue(this.sentimentTest),
-    b:
-      this.colorRed.b +
-      (this.colorGreen.b - this.colorRed.b) *
-      this.normalizeValue(this.sentimentTest),
-  };
-
-  constructor (private apiService: ApiService) { }
-
-  ngOnInit(): void {
-  }
+  constructor(
+    private apiService: ApiService,
+    private notificationService: NotificationService
+  ) { }
 
   onSubmit() {
-    this.apiService
-      .sentimentAnalysis(this.entityModel.text, this.entityModel.language).subscribe(
-        value => {
-          this.sentiment = value.sentiment;
-          this.sentimentColor = {
-            r:
-              this.colorRed.r +
-              (this.colorGreen.r - this.colorRed.r) *
-              this.normalizeValue(this.sentiment.score),
-            g:
-              this.colorRed.g +
-              (this.colorGreen.g - this.colorRed.g) *
-              this.normalizeValue(this.sentiment.score),
-            b:
-              this.colorRed.b +
-              (this.colorGreen.b - this.colorRed.b) *
-              this.normalizeValue(this.sentiment.score),
-          };
-        },
-      error => alert(error.error.message));
+    this.apiService.sentimentAnalysis(this.entityModel.text).subscribe({
+      next: sentiment => {
+        this.sentiment = sentiment;
+        this.sentimentColor = this.toColor(sentiment.score);
+      },
+      error: error => this.notificationService.fromHttpError(error)
+    });
+  }
+
+  /** Blends red to green across the [-1, 1] score range. */
+  private toColor(score: number) {
+    const t = this.normalizeValue(score);
+    return {
+      r: this.colorRed.r + (this.colorGreen.r - this.colorRed.r) * t,
+      g: this.colorRed.g + (this.colorGreen.g - this.colorRed.g) * t,
+      b: this.colorRed.b + (this.colorGreen.b - this.colorRed.b) * t,
+    };
   }
 
   normalizeValue(value: number): number {
     return (value - -1) / (1 - -1);
-  }
-
-  handleChange($event: any) {
-    this.entityModel.language = $event.target.value;
   }
 }

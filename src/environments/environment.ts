@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  BASE_URL: "https://api.dandelion.eu/datatxt"
+  // Hugging Face serverless inference: one endpoint per model.
+  BASE_URL: "https://router.huggingface.co/hf-inference/models"
 };
 
 /*

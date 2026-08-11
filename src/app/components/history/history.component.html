@@ -1,6 +1,19 @@
-<ul>
-  <li *ngFor="let log of historyService.log" class="text-break">
-    [{{ log.timestamp | date: "d.M.yyyy, h:mm:ss" }}] GET
-    {{ log.endpoint }}
-  </li>
-</ul>
+<h1 class="mb-4">Request history</h1>
+
+@if (!historyService.log.length) {
+  <p class="text-secondary">
+    No API requests have been made in this session yet.
+  </p>
+}
+
+@if (historyService.log.length) {
+  <ul class="list-group shadow-sm">
+    @for (log of historyService.log; track log) {
+      <li class="list-group-item text-break">
+        <span class="badge bg-secondary me-2">{{ log.method }}</span>
+        <small class="text-secondary me-2">{{ log.timestamp | date: "d.M.yyyy, h:mm:ss" }}</small>
+        <code class="text-break">{{ log.endpoint }}</code>
+      </li>
+    }
+  </ul>
+}

@@ -1,37 +1,40 @@
-<p>Sentiment Analysis</p>
-<form (ngSubmit)="onSubmit()">
-  <label>Text</label>
-  <br>
-  <textarea
-    name="text"
-    type="text"
-    required
-    [(ngModel)]="entityModel.text"
-  ></textarea>
-  <br>
-  <label>Language</label>
-  <select class="form-select" (change)="handleChange($event)">
-    <option *ngFor="let option of options" [value]="option.id">
-      {{ option.name }}
-    </option>
-  </select>
-  <br>
-  <button type="submit">Submit</button>
+<h1 class="mb-4">Sentiment analysis</h1>
+<p class="text-secondary">
+  Scores English text from negative to positive, using the
+  <code>distilbert-base-uncased-finetuned-sst-2-english</code> model.
+</p>
+
+<form (ngSubmit)="onSubmit()" class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="mb-3">
+      <label class="form-label" for="text">Text</label>
+      <textarea
+        class="form-control"
+        id="text"
+        rows="5"
+        name="text"
+        required
+        [(ngModel)]="entityModel.text"
+      ></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
 </form>
 
-<h3 class="text-center">Sentiment Analysis Result:</h3>
-<h1
-  class="text-center"
-  [ngStyle]="{
+@if (sentiment) {
+  <div class="card shadow-sm">
+    <div class="card-body text-center">
+      <h2 class="h5 text-secondary">Result</h2>
+      <div
+        class="display-6 rounded py-3 px-2"
+        [ngStyle]="{
           'background-color':
-            'rgb(' +
-            this.sentimentColor.r +
-            ', ' +
-            this.sentimentColor.g +
-            ', ' +
-            this.sentimentColor.b +
-            ')'
+            'rgb(' + sentimentColor.r + ', ' + sentimentColor.g + ', ' + sentimentColor.b + ')'
         }"
->
-  {{ sentiment.score }} - {{ sentiment.type }}
-</h1>
+        >
+        {{ sentiment.score }} &mdash; {{ sentiment.type }}
+      </div>
+    </div>
+  </div>
+}

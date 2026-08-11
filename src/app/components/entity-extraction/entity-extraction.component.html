@@ -1,71 +1,61 @@
-<p>Entity Extraction</p>
-<form (ngSubmit)="onSubmit()">
-  <label>Text</label>
-  <br>
-  <textarea
-    name="text"
-    type="text"
-    required
-    [(ngModel)]="entityModel.text"
-  ></textarea>
-  <br>
-  <label>Min confidence: {{ entityModel.minConf }}</label>
-  <br>
-  <input value="0" type="range" name="minConf" #minConf min="0" max="1" step="0.01" (input)="setMinConf(minConf.value)">
-  <br>
-  <label>Include</label>
-  <div >
-    <input
-      type="checkbox"
-      name="image"
-      value="image"
-      (change)="handleIncludeCheck($event)"
-    />
-    <label>Image</label>
-  </div>
-  <div>
-    <input
-      type="checkbox"
-      name="abstract"
-      value="abstract"
-      (change)="handleIncludeCheck($event)"
-    />
-    <label> Abstract </label>
-  </div>
-  <div>
-    <input
-      type="checkbox"
-      name="categories"
-      value="categories"
-      (change)="handleIncludeCheck($event)"
-    />
-    <label>Categories</label>
-  </div>
-  <div>
-    <button type="submit">Submit</button>
-  </div>
+<h1 class="mb-4">Entity extraction</h1>
+<p class="text-secondary">
+  Finds people, organisations and places in a text, using the
+  <code>dslim/bert-base-NER</code> model.
+</p>
 
-  <div *ngFor="let annotation of annotations">
-    <p>###########################################################</p>
-    <img *ngIf="annotation.image" [src]="annotation.image.thumbnail" [alt]="annotation.label">
-    <div>
-      <p>Annotations</p>
-      <h5>{{ annotation.label }}</h5>
-      <p *ngIf="annotation.abstract">
-        {{ annotation.abstract }}
-      </p>
+<form (ngSubmit)="onSubmit()" class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="mb-3">
+      <label class="form-label" for="text">Text</label>
+      <textarea
+        class="form-control"
+        id="text"
+        rows="5"
+        name="text"
+        required
+        [(ngModel)]="entityModel.text"
+      ></textarea>
     </div>
-    <div *ngIf="annotation.categories">
-      <p>categories</p>
-      <ul>
-        <li
-          *ngFor="let category of annotation.categories"
+
+    <div class="mb-3">
+      <label class="form-label" for="minConf">
+        Min confidence: <span class="badge bg-secondary">{{ entityModel.minConf }}</span>
+      </label>
+      <input
+        class="form-range"
+        id="minConf"
+        value="0"
+        type="range"
+        name="minConf"
+        #minConf
+        min="0"
+        max="1"
+        step="0.01"
+        (input)="setMinConf(minConf.value)"
         >
-          {{ category }}
-        </li>
-      </ul>
     </div>
-    <p>###########################################################</p>
-  </div>
 
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
 </form>
+
+@if (submitted && !annotations.length) {
+  <p class="text-secondary">No entities found above that confidence threshold.</p>
+}
+
+<div class="row row-cols-1 row-cols-md-2 g-3">
+  @for (annotation of annotations; track $index) {
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center gap-3">
+          <h2 class="card-title h5 mb-0">{{ annotation.label }}</h2>
+          <div class="text-end flex-shrink-0">
+            <span class="badge {{ badgeClass(annotation.type) }}">{{ annotation.type }}</span>
+            <div class="small text-secondary mt-1">{{ annotation.confidence | number: '1.2-2' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
